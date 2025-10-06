@@ -1,0 +1,30 @@
+.alert {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.alert-danger {
+  background-color: #dc2626;
+  border: 1px solid #b91c1c;
+}
+
+.alert-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.alert-close:hover {
+  color: #d1d5db;
+}

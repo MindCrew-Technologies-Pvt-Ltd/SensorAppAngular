@@ -1,0 +1,20 @@
+<div class="stats-section">
+  <h2 class="section-title">{{ title() }}</h2>
+  @if (anomalies().length === 0) {
+    <div class="no-data">{{ emptyMessage() }}</div>
+  } @else {
+    <ul class="anomaly-list">
+      @for (anomaly of anomalies(); track anomaly.timestamp) {
+        <li [class]="getAnomalyItemClass(anomaly)">
+          <div class="anomaly-content">
+            <div>
+              <p [class]="getAlertTypeClass(anomaly)">{{ getAlertType(anomaly) }}</p>
+              <p class="anomaly-details">{{ anomaly.id }} at {{ getFormattedTime(anomaly) }}</p>
+            </div>
+            <p class="anomaly-value-large">{{ anomaly.value.toFixed(1) }}</p>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</div>

@@ -32,7 +32,12 @@ import { SensorReading, Anomaly, MetricData, StatusItem } from './shared/types/d
         [isStreaming]="isStreaming()"
         (toggleStreaming)="toggleStreaming()"
         (clearData)="clearData()"
-      />W
+      />
+
+      <app-anomaly-alert
+        [anomaly]="latestAnomaly()"
+        (dismiss)="dismissAnomaly()"
+      />
 
       <!-- Main Dashboard Grid -->
       <div class="dashboard-grid">
@@ -44,6 +49,10 @@ import { SensorReading, Anomaly, MetricData, StatusItem } from './shared/types/d
         <div class="stats-panel">
           <app-metrics-panel
             [metrics]="keyMetrics()"
+          />
+
+          <app-anomaly-history
+            [anomalies]="recentAnomalies()"
           />
 
           <app-system-status
