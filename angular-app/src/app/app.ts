@@ -50,26 +50,68 @@ export class App implements OnInit, OnDestroy {
 
   totalCount = computed(() => this.allReadings().length);
 
+  // Optimized computed signals with memoization
+  private readonly _statsCache = {
+    readings: null as SensorReading[] | null,
+    max: 0,
+    min: 0,
+    sum: 0
+  };
+
+  // Optimized statistics computation with caching
+  private computeStats = computed(() => {
+    const readings = this.allReadings();
+    if (readings === this._statsCache.readings) {
+      return {
+        max: this._statsCache.max,
+        min: this._statsCache.min,
+        sum: this._statsCache.sum
+      };
+    }
+
+    // Only recalculate when readings change
+    if (readings.length === 0) {
+      return { max: 0, min: 0, sum: 0 };
+    }
+
+    let max = readings[0].value;
+    let min = readings[0].value;
+    let sum = 0;
+
+    // Single pass through the data
+    for (const reading of readings) {
+      const value = reading.value;
+      sum += value;
+      if (value > max) max = value;
+      if (value < min) min = value;
+    }
+
+    // Cache the results
+    this._statsCache.readings = readings;
+    this._statsCache.max = max;
+    this._statsCache.min = min;
+    this._statsCache.sum = sum;
+
+    return { max, min, sum };
+  });
+
   liveAverage = computed(() => {
     const readings = this.allReadings();
-    const last100 = readings.slice(-100);
-    if (last100.length === 0) return '0.00';
-    const avg = last100.reduce((sum, reading) => sum + reading.value, 0) / last100.length;
-    return avg.toFixed(2);
+    if (readings.length === 0) return '0.00';
+    
+    const last100 = readings.length > 100 ? readings.slice(-100) : readings;
+    const sum = last100.reduce((acc, reading) => acc + reading.value, 0);
+    return (sum / last100.length).toFixed(2);
   });
 
   maxValue = computed(() => {
-    const readings = this.allReadings();
-    if (readings.length === 0) return '0.00';
-    const max = Math.max(...readings.map(r => r.value));
-    return max.toFixed(2);
+    const stats = this.computeStats();
+    return stats.max.toFixed(2);
   });
 
   minValue = computed(() => {
-    const readings = this.allReadings();
-    if (readings.length === 0) return '0.00';
-    const min = Math.min(...readings.map(r => r.value));
-    return min.toFixed(2);
+    const stats = this.computeStats();
+    return stats.min.toFixed(2);
   });
 
   recentAnomalies = computed(() => {
@@ -225,54 +267,60 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
+  // Optimized data generation with batch processing
   private generateDataBatch() {
-    const newReadings: SensorReading[] = [];
     const now = Date.now();
+    const batchSize = 10;
+    const newReadings: SensorReading[] = new Array(batchSize);
+    const newAnomalies: Anomaly[] = [];
     
-    // Generate 10 new data points
-    for (let i = 0; i < 10; i++) {
+    // Pre-allocate arrays for better performance
+    for (let i = 0; i < batchSize; i++) {
       const reading: SensorReading = {
         id: `SENS-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
         value: Math.random() * 100,
         timestamp: now + i
       };
       
-      newReadings.push(reading);
+      newReadings[i] = reading;
       
-      // Check for anomaly
+      // Batch anomaly detection
       if (reading.value < this.ANOMALY_THRESHOLD_LOW || reading.value > this.ANOMALY_THRESHOLD_HIGH) {
-        this.addAnomaly(reading);
+        newAnomalies.push({
+          id: reading.id,
+          value: reading.value,
+          timestamp: reading.timestamp,
+          formatted: format(new Date(reading.timestamp), 'MMM dd, HH:mm:ss')
+        });
       }
     }
     
-    // Update readings with FIFO logic
+    // Efficient array updates with minimal allocations
     const currentReadings = this.allReadings();
-    const updatedReadings = [...currentReadings, ...newReadings];
+    let updatedReadings: SensorReading[];
     
-    // Maintain buffer size
-    if (updatedReadings.length > this.MAX_BUFFER_SIZE) {
-      const excess = updatedReadings.length - this.MAX_BUFFER_SIZE;
-      updatedReadings.splice(0, excess);
+    if (currentReadings.length + batchSize > this.MAX_BUFFER_SIZE) {
+      // Calculate how many to remove
+      const excess = (currentReadings.length + batchSize) - this.MAX_BUFFER_SIZE;
+      // Use slice to create new array more efficiently
+      updatedReadings = [...currentReadings.slice(excess), ...newReadings];
+    } else {
+      updatedReadings = [...currentReadings, ...newReadings];
     }
     
     this.allReadings.set(updatedReadings);
+    
+    // Batch anomaly updates
+    if (newAnomalies.length > 0) {
+      const currentAnomalies = this.anomalies();
+      this.anomalies.set([...currentAnomalies, ...newAnomalies]);
+      
+      // Set the last anomaly as latest
+      this.latestAnomaly.set(newAnomalies[newAnomalies.length - 1]);
+    }
   }
 
-  private addAnomaly(reading: SensorReading) {
-    const anomaly: Anomaly = {
-      id: reading.id,
-      value: reading.value,
-      timestamp: reading.timestamp,
-      formatted: format(new Date(reading.timestamp), 'MMM dd, HH:mm:ss')
-    };
-    
-    // Add to anomalies list
-    const currentAnomalies = this.anomalies();
-    this.anomalies.set([...currentAnomalies, anomaly]);
-    
-    // Set as latest anomaly for banner
-    this.latestAnomaly.set(anomaly);
-  }
+  // Remove unused addAnomaly method since we now batch process anomalies
 
   dismissAnomaly() {
     this.latestAnomaly.set(null);

@@ -21,13 +21,25 @@ export class ChartWidget implements AfterViewInit, OnDestroy {
   data = input<SensorReading[]>([]);
   
   private chart: Chart | null = null;
+  private updateDebouncer: number | null = null;
 
   constructor() {
-    // React to data changes
+    // Debounced chart updates for better performance
     effect(() => {
       if (this.chart && this.data()) {
-        this.updateChart();
+        this.scheduleChartUpdate();
       }
+    });
+  }
+
+  private scheduleChartUpdate() {
+    if (this.updateDebouncer) {
+      cancelAnimationFrame(this.updateDebouncer);
+    }
+    
+    this.updateDebouncer = requestAnimationFrame(() => {
+      this.updateChart();
+      this.updateDebouncer = null;
     });
   }
 
@@ -36,8 +48,16 @@ export class ChartWidget implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // Clean up debouncer
+    if (this.updateDebouncer) {
+      cancelAnimationFrame(this.updateDebouncer);
+      this.updateDebouncer = null;
+    }
+    
+    // Destroy chart
     if (this.chart) {
       this.chart.destroy();
+      this.chart = null;
     }
   }
 

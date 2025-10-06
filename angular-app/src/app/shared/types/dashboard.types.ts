@@ -1,24 +1,34 @@
 export interface SensorReading {
-  id: string;
-  value: number;
-  timestamp: number;
+  readonly id: string;
+  readonly value: number;
+  readonly timestamp: number;
 }
 
 export interface Anomaly {
-  id: string;
-  value: number;
-  timestamp: number;
-  formatted: string;
+  readonly id: string;
+  readonly value: number;
+  readonly timestamp: number;
+  readonly formatted: string;
 }
 
 export interface MetricData {
-  label: string;
-  value: string;
-  color: 'blue' | 'green' | 'orange' | 'purple';
+  readonly label: string;
+  readonly value: string;
+  readonly color: 'blue' | 'green' | 'orange' | 'purple';
 }
 
 export interface StatusItem {
-  label: string;
-  value: string;
-  status: 'active' | 'inactive' | 'info' | 'warning';
+  readonly label: string;
+  readonly value: string;
+  readonly status: 'active' | 'inactive' | 'info' | 'warning';
 }
+
+// Performance constants
+export const PERFORMANCE_CONSTANTS = {
+  MAX_BUFFER_SIZE: 100000,
+  CHART_DISPLAY_SIZE: 300,
+  ANOMALY_THRESHOLD_LOW: 10,
+  ANOMALY_THRESHOLD_HIGH: 90,
+  BATCH_SIZE: 10,
+  UPDATE_INTERVAL: 50
+} as const;

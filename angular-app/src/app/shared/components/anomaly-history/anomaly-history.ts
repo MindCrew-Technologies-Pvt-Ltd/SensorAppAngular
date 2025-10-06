@@ -15,14 +15,25 @@ export class AnomalyHistory {
   anomalies = input<Anomaly[]>([]);
   emptyMessage = input<string>('No anomalies detected');
 
+  // Cache for computed values to avoid recalculation
+  private alertTypeCache = new Map<number, string>();
+  private classCache = new Map<number, string>();
+
   getAlertType(anomaly: Anomaly): string {
-    return anomaly.value > 90 ? 'High Value Alert' : 'Low Value Alert';
+    if (!this.alertTypeCache.has(anomaly.timestamp)) {
+      const type = anomaly.value > 90 ? 'High Value Alert' : 'Low Value Alert';
+      this.alertTypeCache.set(anomaly.timestamp, type);
+    }
+    return this.alertTypeCache.get(anomaly.timestamp)!;
   }
 
   getAnomalyItemClass(anomaly: Anomaly): string {
-    const baseClass = 'anomaly-item-base';
-    const typeClass = anomaly.value > 90 ? 'anomaly-item-high' : 'anomaly-item-low';
-    return `${baseClass} ${typeClass}`;
+    if (!this.classCache.has(anomaly.timestamp)) {
+      const baseClass = 'anomaly-item-base';
+      const typeClass = anomaly.value > 90 ? 'anomaly-item-high' : 'anomaly-item-low';
+      this.classCache.set(anomaly.timestamp, `${baseClass} ${typeClass}`);
+    }
+    return this.classCache.get(anomaly.timestamp)!;
   }
 
   getAlertTypeClass(anomaly: Anomaly): string {
