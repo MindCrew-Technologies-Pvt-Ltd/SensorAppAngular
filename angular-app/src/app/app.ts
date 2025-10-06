@@ -26,75 +26,8 @@ import { SensorReading, Anomaly, MetricData, StatusItem } from './shared/types/d
     SystemStatus
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="dashboard">
-      <app-dashboard-header
-        [isStreaming]="isStreaming()"
-        (toggleStreaming)="toggleStreaming()"
-        (clearData)="clearData()"
-      />
-
-      <app-anomaly-alert
-        [anomaly]="latestAnomaly()"
-        (dismiss)="dismissAnomaly()"
-      />
-
-      <!-- Main Dashboard Grid -->
-      <div class="dashboard-grid">
-        <app-chart-widget
-          title="Live Time-Series Chart (Last 300 Points)"
-          [data]="chartData()"
-        />
-
-        <div class="stats-panel">
-          <app-metrics-panel
-            [metrics]="keyMetrics()"
-          />
-
-          <app-anomaly-history
-            [anomalies]="recentAnomalies()"
-          />
-
-          <app-system-status
-            [statusItems]="systemStatusItems()"
-          />
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    :host {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-
-    .dashboard {
-      min-height: 100vh;
-      background-color: #111827;
-      color: white;
-      padding: 1rem;
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    @media (min-width: 1024px) {
-      .dashboard-grid {
-        grid-template-columns: 2fr 1fr;
-        gap: 2rem;
-      }
-    }
-
-    .stats-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-  `]
+  templateUrl: './app.html',
+  styleUrl: './app.css'
 })
 export class App implements OnInit, OnDestroy {
   private streamingInterval: any = null;

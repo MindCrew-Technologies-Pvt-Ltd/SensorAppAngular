@@ -1,5 +1,42 @@
-<app-header></app-header>
-<main>
-  <router-outlet></router-outlet>
-</main>
-<app-footer></app-footer>
+<div class="dashboard">
+  <app-dashboard-header
+    [isStreaming]="isStreaming()"
+    (toggleStreaming)="toggleStreaming()"
+    (clearData)="clearData()"
+  />
+
+  <app-anomaly-alert
+    [anomaly]="latestAnomaly()"
+    (dismiss)="dismissAnomaly()"
+  />
+
+  <!-- Chart Row -->
+  <div class="chart-row">
+    <app-chart-widget
+      title="Live Time-Series Chart (Last 300 Points)"
+      [data]="chartData()"
+    />
+  </div>
+
+  <!-- Metrics Row -->
+  <div class="metrics-row">
+    <app-metrics-panel
+      [metrics]="keyMetrics()"
+    />
+  </div>
+
+  <!-- Anomalies and Status Row -->
+  <div class="anomalies-status-row">
+    <div class="anomalies-section">
+      <app-anomaly-history
+        [anomalies]="recentAnomalies()"
+      />
+    </div>
+    
+    <div class="status-section">
+      <app-system-status
+        [statusItems]="systemStatusItems()"
+      />
+    </div>
+  </div>
+</div>
