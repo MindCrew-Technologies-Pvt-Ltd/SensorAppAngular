@@ -1,0 +1,46 @@
+.stats-section {
+  background-color: #1f2937;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.status-label {
+  color: #9ca3af;
+}
+
+.status-value {
+  font-weight: 500;
+}
+
+.status-active {
+  color: #34d399;
+}
+
+.status-inactive {
+  color: #f87171;
+}
+
+.status-info {
+  color: #60a5fa;
+}
+
+.status-warning {
+  color: #fbbf24;
+}

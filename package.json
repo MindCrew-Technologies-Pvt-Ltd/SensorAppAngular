@@ -10,6 +10,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@angular/cli": "^20.3.4"
+    "@angular/cli": "^20.3.4",
+    "@types/chart.js": "^2.9.41",
+    "chart.js": "^4.5.0",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "date-fns": "^4.1.0",
+    "tailwindcss": "^4.1.14"
   }
 }
