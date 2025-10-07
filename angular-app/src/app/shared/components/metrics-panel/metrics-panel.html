@@ -1,0 +1,11 @@
+<div class="stats-section">
+  <h2 class="section-title">{{ title() }}</h2>
+  <div class="metrics-grid">
+    @for (metric of metrics(); track metric.label) {
+      <div class="metric-card">
+        <div class="metric-label">{{ metric.label }}</div>
+        <div [class]="'metric-value metric-' + metric.color">{{ metric.value }}</div>
+      </div>
+    }
+  </div>
+</div>

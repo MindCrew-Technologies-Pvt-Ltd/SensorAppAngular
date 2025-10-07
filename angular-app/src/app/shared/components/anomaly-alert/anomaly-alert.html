@@ -1,0 +1,16 @@
+@if (anomaly()) {
+  <div class="alert alert-danger" [class.has-anomaly]="anomaly()">
+    <div class="alert-content">
+      <div>
+        <strong>ANOMALY DETECTED!</strong> 
+        Sensor {{ anomaly()!.id }} reported value {{ anomaly()!.value }} at {{ anomaly()!.formatted }}
+      </div>
+      <button 
+        (click)="onDismiss()"
+        class="alert-close"
+      >
+        ×
+      </button>
+    </div>
+  </div>
+}

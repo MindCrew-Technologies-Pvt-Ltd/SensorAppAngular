@@ -1,0 +1,62 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dashboard {
+  min-height: 100vh;
+  background-color: #111827;
+  color: white;
+  padding: 1rem;
+}
+
+.chart-row {
+  margin-bottom: 1.5rem;
+}
+
+.metrics-row {
+  margin-bottom: 1.5rem;
+}
+
+.anomalies-status-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .anomalies-status-row {
+    grid-template-columns: 3fr 1fr;
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .dashboard {
+    padding: 2rem;
+  }
+  
+  .chart-row {
+    margin-bottom: 2rem;
+  }
+  
+  .metrics-row {
+    margin-bottom: 2rem;
+  }
+  
+  .anomalies-status-row {
+    gap: 2rem;
+  }
+}
+
+.anomalies-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-section {
+  display: flex;
+  flex-direction: column;
+}

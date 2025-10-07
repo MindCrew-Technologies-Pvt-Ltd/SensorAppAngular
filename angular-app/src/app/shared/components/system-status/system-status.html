@@ -1,0 +1,13 @@
+<div class="stats-section">
+  <h2 class="section-title">{{ title() }}</h2>
+  <div class="status-list">
+    @for (item of statusItems(); track item.label) {
+      <div class="status-item">
+        <span class="status-label">{{ item.label }}:</span>
+        <span [class]="'status-value status-' + item.status">
+          {{ item.value }}
+        </span>
+      </div>
+    }
+  </div>
+</div>

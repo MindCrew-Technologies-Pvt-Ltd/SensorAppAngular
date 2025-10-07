@@ -1,0 +1,19 @@
+<div class="header">
+  <h1 class="title">{{ title() }}</h1>
+  
+  <!-- Control Panel -->
+  <div class="controls">
+    <button 
+      (click)="onToggleStreaming()"
+      [class]="'btn ' + (isStreaming() ? 'btn-danger' : 'btn-success')"
+    >
+      {{ isStreaming() ? 'Stop Streaming' : 'Start Streaming' }}
+    </button>
+    <button 
+      (click)="onClearData()"
+      class="btn btn-secondary"
+    >
+      Clear Data
+    </button>
+  </div>
+</div>
