@@ -1,14 +1,25 @@
 {
-  "name": "workspace",
+  "name": "angular-dotnet-fe",
   "version": "1.0.0",
+  "description": "Real-time sensor dashboard with Angular and .NET backend",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "cd angular-app && ng serve",
+    "build": "cd angular-app && ng build",
+    "test": "cd angular-app && ng test",
+    "dev": "cd angular-app && ng serve --open"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "angular",
+    "signalr",
+    "dashboard",
+    "real-time",
+    "sensor-data",
+    "chartjs",
+    "typescript"
+  ],
+  "author": "Kajal",
+  "license": "MIT",
   "dependencies": {
     "@angular/cli": "^20.3.4",
     "@types/chart.js": "^2.9.41",

@@ -30,7 +30,7 @@ export class AnomalyHistory {
   getAnomalyItemClass(anomaly: Anomaly): string {
     if (!this.classCache.has(anomaly.timestamp)) {
       const baseClass = 'anomaly-item-base';
-      const typeClass = anomaly.value > 90 ? 'anomaly-item-high' : 'anomaly-item-low';
+      const typeClass = anomaly.value > 50 ? 'anomaly-item-high' : 'anomaly-item-low';
       this.classCache.set(anomaly.timestamp, `${baseClass} ${typeClass}`);
     }
     return this.classCache.get(anomaly.timestamp)!;

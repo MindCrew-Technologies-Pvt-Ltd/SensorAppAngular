@@ -1,5 +1,5 @@
 @if (anomaly()) {
-  <div class="alert alert-danger">
+  <div class="alert alert-danger" [class.has-anomaly]="anomaly()">
     <div class="alert-content">
       <div>
         <strong>ANOMALY DETECTED!</strong> 

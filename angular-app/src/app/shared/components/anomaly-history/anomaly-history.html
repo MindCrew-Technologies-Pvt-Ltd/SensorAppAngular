@@ -9,7 +9,7 @@
           <div class="anomaly-content">
             <div>
               <p [class]="getAlertTypeClass(anomaly)">{{ getAlertType(anomaly) }}</p>
-              <p class="anomaly-details">{{ anomaly.id }} at {{ getFormattedTime(anomaly) }}</p>
+              <p class="anomaly-details">at {{ getFormattedTime(anomaly) }}</p>
             </div>
             <p class="anomaly-value-large">{{ anomaly.value.toFixed(1) }}</p>
           </div>

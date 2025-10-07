@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, ViewChild, ElementRef, OnDestroy, AfterViewInit, input, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ViewChild, ElementRef, OnDestroy, AfterViewInit, input, effect, untracked } from '@angular/core';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { format } from 'date-fns';
 import { SensorReading } from '../../types/dashboard.types';
+import 'chartjs-adapter-date-fns'; // <-- Add for time scale support
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -22,23 +23,41 @@ export class ChartWidget implements AfterViewInit, OnDestroy {
   
   private chart: Chart | null = null;
   private updateDebouncer: number | null = null;
+  private previousDataHash = '';
 
   constructor() {
-    // Debounced chart updates for better performance
-    effect(() => {
-      if (this.chart && this.data()) {
-        this.scheduleChartUpdate();
+    // Using setInterval as a more reliable way to check for data changes
+    // since Angular's effect is not triggering consistently
+    setInterval(() => {
+      if (this.chart) {
+        const inputData = this.data();
+        const currentHash = this.calculateDataHash(inputData);
+        
+        // Check if data actually changed by comparing hash
+        if (currentHash !== this.previousDataHash) {
+          this.previousDataHash = currentHash;
+          this.scheduleChartUpdate(inputData);
+        }
       }
-    });
+    }, 100); // Check for updates every 100ms
   }
 
-  private scheduleChartUpdate() {
+  // Calculate a simple hash of the data to detect changes
+  private calculateDataHash(data: SensorReading[]): string {
+    if (data.length === 0) return 'empty';
+    
+    // For performance, only consider the last 10 data points for hash calculation
+    const samplePoints = data.length > 10 ? data.slice(-10) : data;
+    return samplePoints.map(r => r.id + r.timestamp + r.value).join('|');
+  }
+
+  private scheduleChartUpdate(chartData: SensorReading[]) {
     if (this.updateDebouncer) {
       cancelAnimationFrame(this.updateDebouncer);
     }
     
     this.updateDebouncer = requestAnimationFrame(() => {
-      this.updateChart();
+      this.updateChart(chartData);
       this.updateDebouncer = null;
     });
   }
@@ -95,14 +114,24 @@ export class ChartWidget implements AfterViewInit, OnDestroy {
           tooltip: {
             callbacks: {
               label: (context) => {
-                return `Value: ${context.parsed.y.toFixed(2)}`;
+                const date = format(new Date(context.parsed.x), 'yyyy-MM-dd HH:mm:ss');
+                return `Date: ${date}, Value: ${context.parsed.y.toFixed(2)}`;
               }
             }
           }
         },
         scales: {
           x: {
-            type: 'linear',
+            type: 'time',
+            time: {
+              unit: 'minute',
+              tooltipFormat: 'yyyy-MM-dd HH:mm:ss',
+              displayFormats: {
+                minute: 'HH:mm',
+                hour: 'HH:mm',
+                second: 'HH:mm:ss'
+              }
+            },
             position: 'bottom',
             grid: {
               color: 'rgba(255, 255, 255, 0.1)'
@@ -137,19 +166,36 @@ export class ChartWidget implements AfterViewInit, OnDestroy {
     };
 
     this.chart = new Chart(ctx, config);
-    this.updateChart();
   }
 
-  private updateChart() {
+  private updateChart(chartData: SensorReading[]) {
     if (!this.chart) return;
-
-    const data = this.data();
     
-    this.chart.data.labels = data.map(reading => reading.timestamp);
-    this.chart.data.datasets[0].data = data.map(reading => ({
-      x: reading.timestamp,
-      y: reading.value
-    }));
+
+    // Only keep the latest N points for live streaming effect (optional)
+    const maxPoints = 100;
+    const trimmedData = chartData.length > maxPoints ? chartData.slice(chartData.length - maxPoints) : chartData;
+    
+    this.chart.data.labels = trimmedData.map(reading => reading.timestamp);
+    // For Chart.js time series with time scale, provide data as [x, y] tuples where x is timestamp
+    this.chart.data.datasets[0].data = trimmedData.map(reading => {
+      // Convert timestamp to milliseconds since epoch
+      let xValue: number;
+      
+      if (typeof reading.timestamp === 'string') {
+        // Parse ISO date string to timestamp
+        xValue = new Date(reading.timestamp).getTime();
+      } else if (typeof reading.timestamp === 'number') {
+        // Assume it's already a timestamp in milliseconds
+        xValue = reading.timestamp;
+      } else {
+        // Fallback to current time
+        xValue = Date.now();
+      }
+      
+      // Return as [x, y] tuple which is compatible with Chart.js time series
+      return [xValue, reading.value] as [number, number];
+    });
     
     this.chart.update('none');
   }

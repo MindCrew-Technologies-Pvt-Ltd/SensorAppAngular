@@ -1,27 +1,22 @@
 <div class="dashboard">
   <app-dashboard-header
-    [isStreaming]="isStreaming()"
+    [isStreaming]="data.isStreaming()"
     (toggleStreaming)="toggleStreaming()"
     (clearData)="clearData()"
-  />
-
-  <app-anomaly-alert
-    [anomaly]="latestAnomaly()"
-    (dismiss)="dismissAnomaly()"
   />
 
   <!-- Chart Row -->
   <div class="chart-row">
     <app-chart-widget
       title="Live Time-Series Chart (Last 300 Points)"
-      [data]="chartData()"
+      [data]="data.chartData()"
     />
   </div>
 
   <!-- Metrics Row -->
   <div class="metrics-row">
     <app-metrics-panel
-      [metrics]="keyMetrics()"
+      [metrics]="data.keyMetrics()"
     />
   </div>
 
@@ -29,13 +24,13 @@
   <div class="anomalies-status-row">
     <div class="anomalies-section">
       <app-anomaly-history
-        [anomalies]="recentAnomalies()"
+        [anomalies]="data.recentAnomalies()"
       />
     </div>
     
     <div class="status-section">
       <app-system-status
-        [statusItems]="systemStatusItems()"
+        [statusItems]="data.systemStatusItems()"
       />
     </div>
   </div>
